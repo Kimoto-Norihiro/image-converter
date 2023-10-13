@@ -29,14 +29,7 @@ func NewGCSBucket(credentialsFile string, bucketName string) GCSBucket {
 	}
 }
 
-func (gcs GCSBucket) UploadFile(localFileName string, gcsFileName string) {
-	// アップロードするファイルを開く
-	file, err := os.Open(localFileName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
+func (gcs GCSBucket) UploadFile(file *os.File, gcsFileName string) {
 	// バケット内のアップロード先のオブジェクトを作成
 	obj := gcs.bucket.Object(gcsFileName)
 
