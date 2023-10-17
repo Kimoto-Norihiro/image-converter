@@ -11,4 +11,5 @@ type ImageRepository interface {
 	ListImages(ctx context.Context, db *gorm.DB) ([]imagemodel.Image, error)
 	Update(ctx context.Context, db *gorm.DB, entity *ImageEntity) error
 	Create(ctx context.Context, db *gorm.DB, entity *ImageEntity) error
+	FindForUpdate(ctx context.Context, tx *gorm.DB, id int) (*ImageEntity, error)
 }

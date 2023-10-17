@@ -7,7 +7,7 @@ import (
 )
 
 type ImageUsecase interface {
-	CreateImage(ctx context.Context) error
+	CreateImage(ctx context.Context, objectName string, resizeWidthPercent int, resizeHeightPercent int, encodeFormat imagemodel.EncodeFormat) error
 	ListImages(ctx context.Context) ([]imagemodel.Image, error)
-	ConvertImage(ctx context.Context) error
+	UpdateImage(ctx context.Context, id int, statusID *imagemodel.ImageStatus, convertedImageURL *string) error
 }

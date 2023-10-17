@@ -12,12 +12,18 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/Kimoto-Norihiro/image-converter/database"
+	"github.com/joho/godotenv"
 
 	imageservecepb "github.com/Kimoto-Norihiro/image-converter/pkg/grpc"
 	"github.com/Kimoto-Norihiro/image-converter/services/imageservice"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	port := 8080
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
