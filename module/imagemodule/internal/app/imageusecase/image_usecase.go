@@ -43,14 +43,14 @@ func (u *ImageUsecase) CreateImage(ctx context.Context, objectName string, resiz
 		if err != nil {
 			return err
 		}
-		
+
 		return nil
 	})
 
 	return nil
 }
 
-func (u *ImageUsecase) UpdateImage(ctx context.Context, id int, statusID *imagemodel.ImageStatus, convertedImageURL *string) error {
+func (u *ImageUsecase) UpdateImage(ctx context.Context, id int64, statusID *imagemodel.ImageStatus, convertedImageURL *string) error {
 	var entity *imageentity.ImageEntity
 
 	u.db.Transaction(func(tx *gorm.DB) error {

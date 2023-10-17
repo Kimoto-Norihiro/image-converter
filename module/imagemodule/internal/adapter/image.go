@@ -43,7 +43,7 @@ func (r *repo) Create(ctx context.Context, tx *gorm.DB, entity *imageentity.Imag
 	return tx.Create(ImageDTO).Error
 }
 
-func (r *repo) FindForUpdate(ctx context.Context, tx *gorm.DB, id int) (*imageentity.ImageEntity, error) {
+func (r *repo) FindForUpdate(ctx context.Context, tx *gorm.DB, id int64) (*imageentity.ImageEntity, error) {
 	var image ImageDTO
 	err := tx.Where("id = ?", id).First(&image).Error
 	if err != nil {

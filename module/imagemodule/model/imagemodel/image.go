@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
-	"log"
 	"os"
 
 	"github.com/samber/mo"
@@ -46,19 +45,17 @@ func (i *Image) DeepClone() *Image {
 	return &cloned
 }
 
-func (i *Image) Converter(fileName string) {
+func (i *Image) Converter(fileName string) error {
 	filepath := fmt.Sprintf("/img/%s", fileName)
 	file, err := os.Open(filepath)
 	if err != nil {
-		log.Println("os.Open error")
-		log.Fatal(err)
+		return err
 	}
 	defer file.Close()
 
 	srcImg, _, err := image.Decode(file)
 	if err != nil {
-		log.Println("image.Decode error")
-		fmt.Fprintln(os.Stderr, err)
+		return err
 	}
 
 	srcRct := srcImg.Bounds()
@@ -70,7 +67,7 @@ func (i *Image) Converter(fileName string) {
 
 	dst, err := os.Create(resizeFilePath)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer dst.Close()
 
@@ -79,20 +76,22 @@ func (i *Image) Converter(fileName string) {
 	case JPEG:
 		err = jpeg.Encode(dst, dstImg, &jpeg.Options{Quality: 100})
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	case PNG:
 		err = png.Encode(dst, dstImg)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	// 変換前のファイルを削除
 	err = os.Remove(fileName)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
 
 type ImageToUpdate struct {
