@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/samber/mo"
 	"golang.org/x/image/draw"
 )
 
@@ -34,6 +35,15 @@ type Image struct {
 	EncodeFormat        EncodeFormat
 	Status              ImageStatus
 	ConvertedImageURL   string
+}
+
+func (i *Image) DeepClone() *Image {
+	if i == nil {
+		return nil
+	}
+
+	cloned := *i
+	return &cloned
 }
 
 func (i *Image) Converter(fileName string) {
@@ -83,4 +93,9 @@ func (i *Image) Converter(fileName string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+type ImageToUpdate struct {
+	Status            mo.Option[ImageStatus]
+	ConvertedImageURL mo.Option[string]
 }
