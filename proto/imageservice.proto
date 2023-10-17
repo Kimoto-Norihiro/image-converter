@@ -1,0 +1,34 @@
+// protoのバージョンの宣言
+syntax = "proto3";
+
+// protoファイルから自動生成させるGoのコードの置き先
+// (詳細は4章にて)
+option go_package = "pkg/grpc";
+
+// packageの宣言
+package imageservice;
+
+// サービスの定義
+service ImageService {
+	// rpc CreateImages (CreateImagesRequest) returns (CreateImagesResponse);
+	// rpc ListImages (ListImagesRequest) returns (ListImagesResponse);
+	rpc ConvertImages (ConvertImagesRequest) returns (ConvertImagesResponse);
+}
+
+// message CreateImagesRequest {
+// }
+
+// message CreateImagesResponse {
+// }
+
+// message ListImagesRequest {
+// }
+
+// message ListImagesResponse {
+// }
+
+message ConvertImagesRequest {
+}
+
+message ConvertImagesResponse {
+}

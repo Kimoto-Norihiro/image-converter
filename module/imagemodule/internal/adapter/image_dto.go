@@ -3,12 +3,13 @@ package imagerepository
 import "github.com/Kimoto-Norihiro/image-converter/module/imagemodule/model/imagemodel"
 
 type ImageDTO struct {
-	ID                  int64  `json:"id"`
-	ObjectName          string `json:"object_name"`
-	ResizeWidthPercent  int    `json:"resize_width_percent"`
-	ResizeHeightPercent int    `json:"resize_height_percent"`
-	EncodeFormatID      int    `json:"encode_format_id"`
-	StatusID            int    `json:"status_id"`
+	ID                  int64  `json:"id" gorm:"primaryKey;autoIncrement:true"`
+	ObjectName          string `json:"object_name" gorm:"unique"`
+	ResizeWidthPercent  int    `json:"resize_width_percent" gorm:"not null"`
+	ResizeHeightPercent int    `json:"resize_height_percent" gorm:"not null"`
+	EncodeFormatID      int    `json:"encode_format_id" gorm:"not null"`
+	StatusID            int    `json:"status_id" gorm:"not null"`
+	ConvertedImageURL   string `json:"converted_image_url"`
 }
 
 func (ImageDTO) TableName() string {
@@ -26,12 +27,13 @@ func ImageFromDTO(dto *ImageDTO) (*imagemodel.Image, error) {
 	}
 
 	model := &imagemodel.Image{
-		ID:        dto.ID,
-		ObjectName: dto.ObjectName,
+		ID:                  dto.ID,
+		ObjectName:          dto.ObjectName,
 		ResizeWidthPercent:  dto.ResizeWidthPercent,
 		ResizeHeightPercent: dto.ResizeHeightPercent,
 		EncodeFormat:        encodeFormat,
 		Status:              status,
+		ConvertedImageURL:   dto.ConvertedImageURL,
 	}
 
 	return model, nil
@@ -70,6 +72,7 @@ func DTOFromImage(model *imagemodel.Image) (*ImageDTO, error) {
 		ResizeHeightPercent: model.ResizeHeightPercent,
 		EncodeFormatID:      encodeFormatID,
 		StatusID:            statusID,
+		ConvertedImageURL:   model.ConvertedImageURL,
 	}
 
 	return dto, nil

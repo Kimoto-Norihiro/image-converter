@@ -3,11 +3,12 @@ package imageentity
 import (
 	"context"
 
+	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/model/imagemodel"
 	"gorm.io/gorm"
 )
 
 type ImageRepository interface {
-	ListImages(ctx context.Context, db *gorm.DB) ([]ImageEntity, error)
+	ListImages(ctx context.Context, db *gorm.DB) ([]imagemodel.Image, error)
 	Update(ctx context.Context, db *gorm.DB, entity *ImageEntity) error
-	Convert(ctx context.Context, db *gorm.DB, entity *ImageEntity) error
+	Create(ctx context.Context, db *gorm.DB, entity *ImageEntity) error
 }
