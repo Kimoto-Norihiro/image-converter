@@ -11,7 +11,7 @@ package imageservice;
 // サービスの定義
 service ImageService {
 	// rpc CreateImages (CreateImagesRequest) returns (CreateImagesResponse);
-	// rpc ListImages (ListImagesRequest) returns (ListImagesResponse);
+	rpc ListImages (ListImagesRequest) returns (ListImagesResponse);
 	rpc ConvertImages (ConvertImagesRequest) returns (ConvertImagesResponse);
 }
 
@@ -21,11 +21,11 @@ service ImageService {
 // message CreateImagesResponse {
 // }
 
-// message ListImagesRequest {
-// }
+message ListImagesRequest {
+}
 
-// message ListImagesResponse {
-// }
+message ListImagesResponse {
+}
 
 message ConvertImagesRequest {
 }
