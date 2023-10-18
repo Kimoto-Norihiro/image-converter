@@ -46,7 +46,7 @@ func (i *Image) DeepClone() *Image {
 }
 
 func (i *Image) Converter(fileName string) error {
-	filepath := fmt.Sprintf("/img/%s", fileName)
+	filepath := fmt.Sprintf("/tmp/%s", fileName)
 	file, err := os.Open(filepath)
 	if err != nil {
 		return err
@@ -63,7 +63,7 @@ func (i *Image) Converter(fileName string) error {
 	draw.CatmullRom.Scale(dstImg, dstImg.Bounds(), srcImg, srcRct, draw.Over, nil)
 
 	resizeFileName := fmt.Sprintf("resize-%s", fileName)
-	resizeFilePath := fmt.Sprintf("/img/%s", resizeFileName)
+	resizeFilePath := fmt.Sprintf("/tmp/%s", resizeFileName)
 
 	dst, err := os.Create(resizeFilePath)
 	if err != nil {

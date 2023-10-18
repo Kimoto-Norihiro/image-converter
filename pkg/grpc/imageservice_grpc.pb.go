@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ImageServiceClient interface {
-	// rpc CreateImages (CreateImagesRequest) returns (CreateImagesResponse);
+	CreateImage(ctx context.Context, in *CreateImageRequest, opts ...grpc.CallOption) (*CreateImageResponse, error)
 	ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error)
 	ConvertImages(ctx context.Context, in *ConvertImagesRequest, opts ...grpc.CallOption) (*ConvertImagesResponse, error)
 }
@@ -33,6 +33,15 @@ type imageServiceClient struct {
 
 func NewImageServiceClient(cc grpc.ClientConnInterface) ImageServiceClient {
 	return &imageServiceClient{cc}
+}
+
+func (c *imageServiceClient) CreateImage(ctx context.Context, in *CreateImageRequest, opts ...grpc.CallOption) (*CreateImageResponse, error) {
+	out := new(CreateImageResponse)
+	err := c.cc.Invoke(ctx, "/imageservice.ImageService/CreateImage", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *imageServiceClient) ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error) {
@@ -57,7 +66,7 @@ func (c *imageServiceClient) ConvertImages(ctx context.Context, in *ConvertImage
 // All implementations must embed UnimplementedImageServiceServer
 // for forward compatibility
 type ImageServiceServer interface {
-	// rpc CreateImages (CreateImagesRequest) returns (CreateImagesResponse);
+	CreateImage(context.Context, *CreateImageRequest) (*CreateImageResponse, error)
 	ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error)
 	ConvertImages(context.Context, *ConvertImagesRequest) (*ConvertImagesResponse, error)
 	mustEmbedUnimplementedImageServiceServer()
@@ -67,6 +76,9 @@ type ImageServiceServer interface {
 type UnimplementedImageServiceServer struct {
 }
 
+func (UnimplementedImageServiceServer) CreateImage(context.Context, *CreateImageRequest) (*CreateImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateImage not implemented")
+}
 func (UnimplementedImageServiceServer) ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListImages not implemented")
 }
@@ -84,6 +96,24 @@ type UnsafeImageServiceServer interface {
 
 func RegisterImageServiceServer(s grpc.ServiceRegistrar, srv ImageServiceServer) {
 	s.RegisterService(&ImageService_ServiceDesc, srv)
+}
+
+func _ImageService_CreateImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ImageServiceServer).CreateImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/imageservice.ImageService/CreateImage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ImageServiceServer).CreateImage(ctx, req.(*CreateImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _ImageService_ListImages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -129,6 +159,10 @@ var ImageService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "imageservice.ImageService",
 	HandlerType: (*ImageServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateImage",
+			Handler:    _ImageService_CreateImage_Handler,
+		},
 		{
 			MethodName: "ListImages",
 			Handler:    _ImageService_ListImages_Handler,

@@ -1,8 +1,8 @@
 package gcsusecase
 
 import (
+	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -54,19 +54,19 @@ func (u *GCSClientUsecase) DownloadFile(ctx context.Context, gcsFileName string)
 	return nil
 }
 
-func (u *GCSClientUsecase) UploadFile(ctx context.Context, localFileName string) error {
+func (u *GCSClientUsecase) UploadFile(ctx context.Context, fileName string) error {
 	bucketName := "image-converted"
 	bucket := u.client.Bucket(bucketName)
 
-	file, err := os.Open(localFileName)
+	filePath := fmt.Sprintf("/tmp/%s", fileName)
+	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
 	}
 	defer file.Close()
 
 	// バケット内のアップロード先のオブジェクトを作成
-	gcsFileName := fmt.Sprintf("converted-%s", localFileName)
-	obj := bucket.Object(gcsFileName)
+	obj := bucket.Object(fileName)
 
 	// ファイルをアップロード
 	wc := obj.NewWriter(ctx)
@@ -78,10 +78,26 @@ func (u *GCSClientUsecase) UploadFile(ctx context.Context, localFileName string)
 	}
 
 	// fileを削除
-	err = os.Remove(localFileName)
+	err = os.Remove(filePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return errors.New("not implemented")
+	return nil
+}
+
+func (u *GCSClientUsecase) UploadNonConvertedFile(ctx context.Context, reader *bytes.Reader, fileName string) error {
+	bucketName := "image-nonconverted"
+	bucket := u.client.Bucket(bucketName)
+
+	obj := bucket.Object(fileName)
+	wc := obj.NewWriter(ctx)
+	if _, err := io.Copy(wc, reader); err != nil {
+		log.Fatal(err)
+	}
+	if err := wc.Close(); err != nil {
+		log.Fatal(err)
+	}
+
+	return nil
 }

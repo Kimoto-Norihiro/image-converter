@@ -10,25 +10,50 @@ package imageservice;
 
 // サービスの定義
 service ImageService {
-	// rpc CreateImages (CreateImagesRequest) returns (CreateImagesResponse);
-	rpc ListImages (ListImagesRequest) returns (ListImagesResponse);
-	rpc ConvertImages (ConvertImagesRequest) returns (ConvertImagesResponse);
+  rpc CreateImage(CreateImageRequest) returns (CreateImageResponse);
+  rpc ListImages(ListImagesRequest) returns (ListImagesResponse);
+  rpc ConvertImages(ConvertImagesRequest) returns (ConvertImagesResponse);
 }
 
-// message CreateImagesRequest {
-// }
-
-// message CreateImagesResponse {
-// }
-
-message ListImagesRequest {
+message CreateImageRequest {
+  bytes image_file = 1;
+  string object_name = 2;
+  int32 resize_width_percent = 3;
+  int32 resize_height_percent = 4;
+  EncodeFormat encode_format = 5;
 }
+
+message CreateImageResponse {}
+
+message ListImagesRequest {}
 
 message ListImagesResponse {
+  repeated Image images = 1;
 }
 
-message ConvertImagesRequest {
+message ConvertImagesRequest {}
+
+message ConvertImagesResponse {}
+
+message Image {
+  int64 id = 1;
+  string object_name = 2;
+  int32 resize_width_percent = 3;
+  int32 resize_height_percent = 4;
+  EncodeFormat encode_format = 5;
+  ImageStatus status = 6;
+  string converted_image_url = 7;
 }
 
-message ConvertImagesResponse {
+enum EncodeFormat {
+  UnknownFormat = 0;
+  JPEG = 1;
+  PNG = 2;
+}
+
+enum ImageStatus {
+  UnknownStatus = 0;
+  Waiting = 1;
+  Succeeded = 2;
+  Failed = 3;
 }

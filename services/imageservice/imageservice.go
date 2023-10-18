@@ -1,9 +1,9 @@
 package imageservice
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/Kimoto-Norihiro/image-converter/gcs"
 	gcsclient "github.com/Kimoto-Norihiro/image-converter/gcs/gcs_client"
@@ -64,13 +64,35 @@ func (s *ImageService) ListImages(ctx context.Context, req *imageservicepb.ListI
 	if err != nil {
 		return nil, err
 	}
-	for i, image := range images {
-		log.Printf("image[%d]: %v", i, image)
+
+	var imagespb []*imageservicepb.Image
+	for _, image := range images {
+		imagespb = append(imagespb, &imageservicepb.Image{
+			Id:                  image.ID,
+			ObjectName:          image.ObjectName,
+			ResizeWidthPercent:  int32(image.ResizeWidthPercent),
+			ResizeHeightPercent: int32(image.ResizeHeightPercent),
+			EncodeFormat:        imageservicepb.EncodeFormat(image.EncodeFormat),
+			Status:              imageservicepb.ImageStatus(image.Status),
+			ConvertedImageUrl:   image.ConvertedImageURL,
+		})
 	}
 
-	return &imageservicepb.ListImagesResponse{}, nil
+	return &imageservicepb.ListImagesResponse{
+		Images: imagespb,
+	}, nil
 }
 
-// func (s *ImageService) CreateImage(ctx context.Context, req *imageservicepb.CreateImageRequest) (*imageservicepb.CreateImageResponse, error) {
-// 	return nil, nil
-// }
+func (s *ImageService) CreateImage(ctx context.Context, req *imageservicepb.CreateImageRequest) (*imageservicepb.CreateImageResponse, error) {
+	reader := bytes.NewReader(req.ImageFile)
+	err := s.gcs.GCSUsecase.UploadNonConvertedFile(ctx, reader, req.ObjectName)
+	if err != nil {
+		return nil, err
+	}
+	err = s.imageModule.ImageUsecase.CreateImage(ctx, req.ObjectName, int(req.ResizeWidthPercent), int(req.ResizeHeightPercent), imagemodel.EncodeFormat(req.EncodeFormat))
+	if err != nil {
+		return nil, err
+	}
+
+	return &imageservicepb.CreateImageResponse{}, nil
+}
