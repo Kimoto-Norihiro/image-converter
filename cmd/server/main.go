@@ -1,7 +1,6 @@
 package main
 
 import (
-	// (一部抜粋)
 	"fmt"
 	"log"
 	"net"
@@ -21,17 +20,16 @@ import (
 func main() {
 	err := godotenv.Load("../../.env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		panic(err)
 	}
 
-	port := 8080
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	port := os.Getenv("SERVER_PORT")
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
 	if err != nil {
 		panic(err)
 	}
 
-	dns := "n000r111:password@tcp(localhost:3306)/image_converter?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := database.NewDB(dns)
+	db, err := database.NewDB()
 	if err != nil {
 		panic(err)
 	}

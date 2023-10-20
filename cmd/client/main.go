@@ -21,14 +21,12 @@ var (
 
 func main() {
 	fmt.Println("start gRPC Client.")
-
 	scanner = bufio.NewScanner(os.Stdin)
 
-	// 2. gRPCサーバーとのコネクションを確立
-	address := "localhost:8080"
+	port := os.Getenv("SERVER_PORT")
+	address := fmt.Sprintf("localhost:%v", port)
 	conn, err := grpc.Dial(
 		address,
-
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
 	)
@@ -38,7 +36,6 @@ func main() {
 	}
 	defer conn.Close()
 
-	// 3. gRPCクライアントを生成
 	client = imageservicepb.NewImageServiceClient(conn)
 
 	for {
