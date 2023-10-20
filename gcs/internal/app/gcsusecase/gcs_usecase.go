@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"os"
 
 	"cloud.google.com/go/storage"
@@ -19,7 +18,7 @@ type GCSClientUsecase struct {
 func NewGCSClientUsecase(ctx context.Context, credentialsFile string) *GCSClientUsecase {
 	client, err := storage.NewClient(ctx, option.WithCredentialsFile(credentialsFile))
 	if err != nil {
-		log.Fatal(err)
+		fmt.Errorf("failed to create client: %v", err)
 	}
 
 	return &GCSClientUsecase{
@@ -28,76 +27,75 @@ func NewGCSClientUsecase(ctx context.Context, credentialsFile string) *GCSClient
 }
 
 func (u *GCSClientUsecase) DownloadFile(ctx context.Context, gcsFileName string) error {
-	bucketName := "image-nonconverted"
-	localFileName := gcsFileName
-	bucket := u.client.Bucket(bucketName)
+	bucket := u.client.Bucket(os.Getenv("NON_CONVERTED_BUCKET_NAME"))
 
-	file, err := os.Create(localFileName)
+	localFilePath := fmt.Sprintf("./img/%s", gcsFileName)
+	file, err := os.Create(localFilePath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create file in DownloadFile: %v", err)
 	}
 	defer file.Close()
 
-	// バケットからオブジェクトをダウンロード
 	rc, err := bucket.Object(gcsFileName).NewReader(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create reader in DownloadFile: %v", err)
 	}
 	defer rc.Close()
 
-	// ファイルに出力
 	if _, err := file.ReadFrom(rc); err != nil {
-		return err
+		return fmt.Errorf("failed to read file in DownloadFile: %v", err)
 	}
 
-	fmt.Println("file download success")
+	fmt.Printf("file download success: %s\n", gcsFileName)
 	return nil
 }
 
-func (u *GCSClientUsecase) UploadFile(ctx context.Context, fileName string) error {
-	bucketName := "image-converted"
-	bucket := u.client.Bucket(bucketName)
+func (u *GCSClientUsecase) UploadFile(ctx context.Context, fileName string) (*string, error) {
+	bucket := u.client.Bucket(os.Getenv("CONVERTED_BUCKET_NAME"))
 
-	filePath := fmt.Sprintf("/tmp/%s", fileName)
+	filePath := fmt.Sprintf("./img/%s", fileName)
 	file, err := os.Open(filePath)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to open file in UploadFile: %v", err)
 	}
 	defer file.Close()
 
-	// バケット内のアップロード先のオブジェクトを作成
 	obj := bucket.Object(fileName)
 
-	// ファイルをアップロード
 	wc := obj.NewWriter(ctx)
 	if _, err := io.Copy(wc, file); err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("failed to copy file in UploadFile: %v", err)
 	}
 	if err := wc.Close(); err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("failed to close file in UploadFile: %v", err)
 	}
 
-	// fileを削除
+	attrs, err := obj.Attrs(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get attrs in UploadFile: %v", err)
+	}
+
 	err = os.Remove(filePath)
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("failed to remove file in UploadFile: %v", err)
 	}
 
-	return nil
+	fmt.Printf("file upload success: %s\n", fileName)
+	return &attrs.MediaLink, nil
 }
 
 func (u *GCSClientUsecase) UploadNonConvertedFile(ctx context.Context, reader *bytes.Reader, fileName string) error {
-	bucketName := "image-nonconverted"
-	bucket := u.client.Bucket(bucketName)
+	bucket := u.client.Bucket(os.Getenv("NON_CONVERTED_BUCKET_NAME"))
 
 	obj := bucket.Object(fileName)
 	wc := obj.NewWriter(ctx)
 	if _, err := io.Copy(wc, reader); err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to copy file in UploadNonConvertedFile: %v", err)
 	}
 	if err := wc.Close(); err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to close file in UploadNonConvertedFile: %v", err)
 	}
 
+	fmt.Printf("file upload success: %s\n", fileName)
 	return nil
 }
