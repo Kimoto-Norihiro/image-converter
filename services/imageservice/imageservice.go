@@ -38,7 +38,7 @@ func (s *ImageService) ConvertImages(ctx context.Context, req *imageservicepb.Co
 			continue
 		}
 
-		err := s.gcs.GCSUsecase.DownloadFile(ctx, image.ObjectName)
+		err := s.gcs.GCSFunction.DownloadFile(ctx, image.ObjectName)
 		if err != nil {
 			return nil, fmt.Errorf("failed to download file: %w", err)
 		}
@@ -52,7 +52,7 @@ func (s *ImageService) ConvertImages(ctx context.Context, req *imageservicepb.Co
 		}
 
 		convertedImagePath := fmt.Sprintf("converted-%s", image.ObjectName)
-		convertedImageURL, err := s.gcs.GCSUsecase.UploadFile(ctx, convertedImagePath)
+		convertedImageURL, err := s.gcs.GCSFunction.UploadFile(ctx, convertedImagePath)
 		if err != nil {
 			return nil, fmt.Errorf("failed to upload file: %w", err)
 		}
@@ -91,7 +91,7 @@ func (s *ImageService) ListImages(ctx context.Context, req *imageservicepb.ListI
 
 func (s *ImageService) CreateImage(ctx context.Context, req *imageservicepb.CreateImageRequest) (*imageservicepb.CreateImageResponse, error) {
 	reader := bytes.NewReader(req.ImageFile)
-	err := s.gcs.GCSUsecase.UploadNonConvertedFile(ctx, reader, req.ObjectName)
+	err := s.gcs.GCSFunction.UploadNonConvertedFile(ctx, reader, req.ObjectName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to upload file: %w", err)
 	}

@@ -11,6 +11,6 @@ func New() *gcs.GCS {
 	ctx := context.Background()
 	credentialsFile := "../../credentials.json"
 	return &gcs.GCS{
-		GCSUsecase: gcsusecase.NewGCSClientUsecase(ctx, credentialsFile),
+		GCSFunction: gcsusecase.NewGCSClientFunction(ctx, credentialsFile),
 	}
 }

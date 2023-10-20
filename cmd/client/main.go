@@ -74,7 +74,7 @@ func ListImages() {
 		fmt.Println(err)
 	} else {
 		for i, image := range res.Images {
-			fmt.Printf("image %d: %v\n", i, image)
+			fmt.Printf("image %d: %v\n", i+1, image)
 		}
 	}
 }

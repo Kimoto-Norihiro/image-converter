@@ -11,22 +11,22 @@ import (
 	"google.golang.org/api/option"
 )
 
-type GCSClientUsecase struct {
+type GCSClientFunction struct {
 	client *storage.Client
 }
 
-func NewGCSClientUsecase(ctx context.Context, credentialsFile string) *GCSClientUsecase {
+func NewGCSClientFunction(ctx context.Context, credentialsFile string) *GCSClientFunction {
 	client, err := storage.NewClient(ctx, option.WithCredentialsFile(credentialsFile))
 	if err != nil {
 		fmt.Errorf("failed to create client: %v", err)
 	}
 
-	return &GCSClientUsecase{
+	return &GCSClientFunction{
 		client: client,
 	}
 }
 
-func (u *GCSClientUsecase) DownloadFile(ctx context.Context, gcsFileName string) error {
+func (u *GCSClientFunction) DownloadFile(ctx context.Context, gcsFileName string) error {
 	bucket := u.client.Bucket(os.Getenv("NON_CONVERTED_BUCKET_NAME"))
 
 	localFilePath := fmt.Sprintf("./img/%s", gcsFileName)
@@ -50,7 +50,7 @@ func (u *GCSClientUsecase) DownloadFile(ctx context.Context, gcsFileName string)
 	return nil
 }
 
-func (u *GCSClientUsecase) UploadFile(ctx context.Context, fileName string) (*string, error) {
+func (u *GCSClientFunction) UploadFile(ctx context.Context, fileName string) (*string, error) {
 	bucket := u.client.Bucket(os.Getenv("CONVERTED_BUCKET_NAME"))
 
 	filePath := fmt.Sprintf("./img/%s", fileName)
@@ -84,7 +84,7 @@ func (u *GCSClientUsecase) UploadFile(ctx context.Context, fileName string) (*st
 	return &attrs.MediaLink, nil
 }
 
-func (u *GCSClientUsecase) UploadNonConvertedFile(ctx context.Context, reader *bytes.Reader, fileName string) error {
+func (u *GCSClientFunction) UploadNonConvertedFile(ctx context.Context, reader *bytes.Reader, fileName string) error {
 	bucket := u.client.Bucket(os.Getenv("NON_CONVERTED_BUCKET_NAME"))
 
 	obj := bucket.Object(fileName)
