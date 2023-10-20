@@ -34,6 +34,10 @@ func (s *ImageService) ConvertImages(ctx context.Context, req *imageservicepb.Co
 		return nil, fmt.Errorf("failed to list images: %w", err)
 	}
 	for _, image := range images {
+		if image.Status == imagemodel.ImageStatus(imagemodel.Succeeded) {
+			continue
+		}
+
 		err := s.gcs.GCSUsecase.DownloadFile(ctx, image.ObjectName)
 		if err != nil {
 			return nil, fmt.Errorf("failed to download file: %w", err)
@@ -95,6 +99,5 @@ func (s *ImageService) CreateImage(ctx context.Context, req *imageservicepb.Crea
 	if err != nil {
 		return nil, fmt.Errorf("failed to create image: %w", err)
 	}
-
 	return &imageservicepb.CreateImageResponse{}, nil
 }

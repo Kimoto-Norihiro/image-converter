@@ -43,7 +43,7 @@ func main() {
 		fmt.Println("2: convert images")
 		fmt.Println("3: create image")
 		fmt.Println("4: exit")
-		fmt.Print("please enter >")
+		fmt.Print("please enter > ")
 
 		scanner.Scan()
 		in := scanner.Text()
@@ -67,7 +67,7 @@ M:
 }
 
 func ListImages() {
-	fmt.Println("image list")
+	fmt.Println("show images")
 	req := &imageservicepb.ListImagesRequest{}
 	res, err := client.ListImages(context.Background(), req)
 	if err != nil {
@@ -88,6 +88,7 @@ func ConvertImages() {
 	} else {
 		fmt.Println(res)
 	}
+	fmt.Println("done")
 }
 
 func CreateImage() {
@@ -95,7 +96,7 @@ func CreateImage() {
 	req := &imageservicepb.CreateImageRequest{}
 
 	for {
-		fmt.Print("image file path >")
+		fmt.Print("image file path: ")
 		scanner.Scan()
 		imageFileName := scanner.Text()
 		imageFilePath := fmt.Sprintf("./img/%s", imageFileName)
@@ -113,7 +114,7 @@ func CreateImage() {
 	}
 
 	for {
-		fmt.Print("resize width percent >")
+		fmt.Print("resize width percent: ")
 		scanner.Scan()
 		input := scanner.Text()
 		i, err := strconv.Atoi(input);
@@ -132,7 +133,7 @@ func CreateImage() {
 	}
 
 	for {
-		fmt.Print("resize height percent >")
+		fmt.Print("resize height percent: ")
 		scanner.Scan()
 		input := scanner.Text()
 		i, err := strconv.Atoi(input);
@@ -150,7 +151,7 @@ func CreateImage() {
 	}
 
 	for {
-		fmt.Print("encode format (1: JPEG or 2: PNG) >")
+		fmt.Print("encode format (1: JPEG or 2: PNG): ")
 		scanner.Scan()
 		input := scanner.Text()
 
@@ -173,4 +174,5 @@ func CreateImage() {
 	} else {
 		fmt.Println(res)
 	}
+	fmt.Println("done")
 }
