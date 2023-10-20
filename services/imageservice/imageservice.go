@@ -31,38 +31,40 @@ func NewImageService(db *gorm.DB) *ImageService {
 func (s *ImageService) ConvertImages(ctx context.Context, req *imageservicepb.ConvertImagesRequest) (*imageservicepb.ConvertImagesResponse, error) {
 	images, err := s.imageModule.ImageUsecase.ListImages(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to list images: %w", err)
 	}
 	for _, image := range images {
 		err := s.gcs.GCSUsecase.DownloadFile(ctx, image.ObjectName)
 		if err != nil {
-			return nil, err
-		}
-		filePath := fmt.Sprintf("/tmp/%s", image.ObjectName)
-		err = image.Converter(filePath)
-		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to download file: %w", err)
 		}
 
-		convertedFilePath := fmt.Sprintf("/tmp/converted-%s", image.ObjectName)
-		err = s.gcs.GCSUsecase.UploadFile(ctx, convertedFilePath)
+		err = image.Convert()
+		var status imagemodel.ImageStatus
 		if err != nil {
-			return nil, err
+			status = imagemodel.ImageStatus(imagemodel.Failed)
+		} else {
+			status = imagemodel.ImageStatus(imagemodel.Succeeded)
 		}
 
-		status := imagemodel.ImageStatus(imagemodel.Succeeded)
-		err = s.imageModule.ImageUsecase.UpdateImage(ctx, image.ID, &status, &convertedFilePath)
+		convertedImagePath := fmt.Sprintf("converted-%s", image.ObjectName)
+		convertedImageURL, err := s.gcs.GCSUsecase.UploadFile(ctx, convertedImagePath)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to upload file: %w", err)
+		}
+
+		err = s.imageModule.ImageUsecase.UpdateImage(ctx, image.ID, &status, convertedImageURL)
+		if err != nil {
+			return nil, fmt.Errorf("failed to update image: %w", err)
 		}
 	}
-	return nil, nil
+	return &imageservicepb.ConvertImagesResponse{}, nil
 }
 
 func (s *ImageService) ListImages(ctx context.Context, req *imageservicepb.ListImagesRequest) (*imageservicepb.ListImagesResponse, error) {
 	images, err := s.imageModule.ImageUsecase.ListImages(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to list images: %w", err)
 	}
 
 	var imagespb []*imageservicepb.Image
@@ -87,11 +89,11 @@ func (s *ImageService) CreateImage(ctx context.Context, req *imageservicepb.Crea
 	reader := bytes.NewReader(req.ImageFile)
 	err := s.gcs.GCSUsecase.UploadNonConvertedFile(ctx, reader, req.ObjectName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to upload file: %w", err)
 	}
 	err = s.imageModule.ImageUsecase.CreateImage(ctx, req.ObjectName, int(req.ResizeWidthPercent), int(req.ResizeHeightPercent), imagemodel.EncodeFormat(req.EncodeFormat))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create image: %w", err)
 	}
 
 	return &imageservicepb.CreateImageResponse{}, nil
