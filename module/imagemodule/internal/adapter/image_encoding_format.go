@@ -1,7 +1,7 @@
 package imagerepository
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/model/imagemodel"
 )
@@ -13,7 +13,7 @@ func ImageEncodingFormatFromID(encodeFormatID int) (imagemodel.EncodeFormat, err
 	case 2:
 		return imagemodel.PNG, nil
 	}
-	return 0, errors.New("invalid encode format id")
+	return 0, fmt.Errorf("invalid encode format id %d", encodeFormatID)
 }
 
 func ImageEncodingFormatToID(encodeFormat imagemodel.EncodeFormat) (int, error) {
@@ -23,5 +23,5 @@ func ImageEncodingFormatToID(encodeFormat imagemodel.EncodeFormat) (int, error) 
 	case imagemodel.PNG:
 		return 2, nil
 	}
-	return 0, errors.New("invalid encode format")
+	return 0, fmt.Errorf("invalid encode format %d", encodeFormat)
 }

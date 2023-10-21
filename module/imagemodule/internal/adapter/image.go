@@ -53,7 +53,7 @@ func (r *repo) FindForUpdate(ctx context.Context, tx *gorm.DB, id int64) (*image
 	if err != nil {
 		return nil, err
 	}
-	return imageentity.NewAsyncJobEntityToUpdate(imageDTO), nil
+	return imageentity.NewImageEntityToUpdate(imageDTO), nil
 }
 
 func dtoImageUpdatedValues(v *imageentity.ImageUpdatedValues) map[string]any {

@@ -22,10 +22,7 @@ type imageUsecaseMockSet struct {
 }
 
 func makeImageUsecaseMockSet(ctrl *gomock.Controller) imageUsecaseMockSet {
-	db, mock, err := database.NewDBMock()
-	if err != nil {
-		panic(err)
-	}
+	db, mock := database.NewDBMock()
 
 	return imageUsecaseMockSet{
 		db:        db,
@@ -56,7 +53,7 @@ func TestListImages(t *testing.T) {
 	var wantErr error = nil
 
 	if !cmp.Equal(got, want) || err != wantErr {
-		t.Errorf(`CreateAsyncJob(ctx) = %+v, %+v; want %+v, %+v`, got, err, want, wantErr)
+		t.Errorf(`CreateImage(ctx) = %+v, %+v; want %+v, %+v`, got, err, want, wantErr)
 	}
 }
 
@@ -126,7 +123,7 @@ func TestUpdateImage(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	m := makeImageUsecaseMockSet(ctrl)
 
-	entity := imageentity.NewAsyncJobEntityToUpdate(&imagemodel.Image{
+	entity := imageentity.NewImageEntityToUpdate(&imagemodel.Image{
 		ID:                  1,
 		ObjectName:          "test.jpg",
 		ResizeWidthPercent:  50,
@@ -163,7 +160,7 @@ func TestUpdateImage_error(t *testing.T) {
 	FailFindForUpdateError := errors.New("failed to find image for update")
 	FailUpdateError := errors.New("failed to update image")
 
-	entity := imageentity.NewAsyncJobEntityToUpdate(&imagemodel.Image{
+	entity := imageentity.NewImageEntityToUpdate(&imagemodel.Image{
 		ID:                  1,
 		ObjectName:          "test.jpg",
 		ResizeWidthPercent:  50,

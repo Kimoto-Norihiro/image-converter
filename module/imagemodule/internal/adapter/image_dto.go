@@ -1,6 +1,10 @@
 package imagerepository
 
-import "github.com/Kimoto-Norihiro/image-converter/module/imagemodule/model/imagemodel"
+import (
+	"fmt"
+
+	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/model/imagemodel"
+)
 
 type ImageDTO struct {
 	ID                  int64  `json:"id" gorm:"primaryKey;autoIncrement:true"`
@@ -19,7 +23,7 @@ func (ImageDTO) TableName() string {
 func ImageFromDTO(dto *ImageDTO) (*imagemodel.Image, error) {
 	encodeFormat, err := ImageEncodingFormatFromID(dto.EncodeFormatID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("invalid encode format id %v", dto)
 	}
 	status, err := ImageStatusFromStatusID(dto.StatusID)
 	if err != nil {

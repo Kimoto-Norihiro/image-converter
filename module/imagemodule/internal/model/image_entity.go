@@ -39,14 +39,14 @@ func NewImageEntityToCreate(
 	}
 }
 
-func NewAsyncJobEntityToUpdate(asyncJob *imagemodel.Image) *ImageEntity {
-	if asyncJob == nil {
+func NewImageEntityToUpdate(image *imagemodel.Image) *ImageEntity {
+	if image == nil {
 		return nil
 	}
 
 	return &ImageEntity{
-		image:    *asyncJob.DeepClone(),
-		original: asyncJob,
+		image:    *image.DeepClone(),
+		original: image,
 	}
 }
 
@@ -55,11 +55,11 @@ type ImageUpdatedValues struct {
 	ConvertedImageURL mo.Option[string]
 }
 
-func (e *ImageEntity) UpdateAsyncJob(asyncJobToUpdate *imagemodel.ImageToUpdate) error {
-	if v, ok := asyncJobToUpdate.Status.Get(); ok {
+func (e *ImageEntity) UpdateImage(imageToUpdate *imagemodel.ImageToUpdate) error {
+	if v, ok := imageToUpdate.Status.Get(); ok {
 		e.image.Status = v
 	}
-	if v, ok := asyncJobToUpdate.ConvertedImageURL.Get(); ok {
+	if v, ok := imageToUpdate.ConvertedImageURL.Get(); ok {
 		e.image.ConvertedImageURL = v
 	}
 

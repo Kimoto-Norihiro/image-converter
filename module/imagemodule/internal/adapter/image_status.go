@@ -1,7 +1,7 @@
 package imagerepository
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/model/imagemodel"
 )
@@ -15,7 +15,7 @@ func ImageStatusFromStatusID(statusID int) (imagemodel.ImageStatus, error) {
 	case 3:
 		return imagemodel.Failed, nil
 	}
-	return 0, errors.New("invalid status id")
+	return 0, fmt.Errorf("invalid status id %d", statusID)
 }
 
 func ImageStatusToStatusID(status imagemodel.ImageStatus) (int, error) {
@@ -27,5 +27,5 @@ func ImageStatusToStatusID(status imagemodel.ImageStatus) (int, error) {
 	case imagemodel.Failed:
 		return 3, nil
 	}
-	return 0, errors.New("invalid status")
+	return 0, fmt.Errorf("invalid status %d", status)
 }

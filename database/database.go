@@ -24,10 +24,10 @@ func NewDB() (db *gorm.DB, err error) {
 	return db, nil
 }
 
-func NewDBMock() (*gorm.DB, sqlmock.Sqlmock, error) {
+func NewDBMock() (*gorm.DB, sqlmock.Sqlmock) {
 	sqlDB, mock, err := sqlmock.New()
 	if err != nil {
-		return nil, nil, err
+		panic(err)
 	}
 
 	mock.ExpectQuery("SELECT VERSION()").WillReturnRows(sqlmock.NewRows([]string{"VERSION()"}).AddRow("8.0.23"))
@@ -36,8 +36,8 @@ func NewDBMock() (*gorm.DB, sqlmock.Sqlmock, error) {
 		Conn: sqlDB,
 	}), &gorm.Config{})
 	if err != nil {
-		return nil, nil, err
+		panic(err)
 	}
 
-	return mockDB, mock, nil
+	return mockDB, mock
 }
