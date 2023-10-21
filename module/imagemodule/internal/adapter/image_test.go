@@ -53,41 +53,41 @@ func TestListImages(t *testing.T) {
 	}
 }
 
-// func TestUpdate(t *testing.T) {
-// 	db, mock := database.NewDBMock()
+func TestUpdate(t *testing.T) {
+	db, mock := database.NewDBMock()
 
-// 	image := imagemodel.Image{
-// 		ID:                  1,
-// 		ObjectName:          "object_name",
-// 		ResizeWidthPercent:  100,
-// 		ResizeHeightPercent: 100,
-// 		EncodeFormat:        1,
-// 		Status:              1,
-// 		ConvertedImageURL:   "",
-// 	}
+	image := imagemodel.Image{
+		ID:                  1,
+		ObjectName:          "object_name",
+		ResizeWidthPercent:  100,
+		ResizeHeightPercent: 100,
+		EncodeFormat:        1,
+		Status:              1,
+		ConvertedImageURL:   "",
+	}
 
-// 	entity := imageentity.NewImageEntityToUpdate(&image)
+	entity := imageentity.NewImageEntityToUpdate(&image)
 
-// 	err := entity.UpdateImage(&imagemodel.ImageToUpdate{
-// 		Status:            mo.Some(imagemodel.ImageStatus(imagemodel.Succeeded)),
-// 		ConvertedImageURL: mo.Some("https://example.com/converted.jpg"),
-// 	})
-// 	if err != nil {
-// 		t.Fatal("failed to set test")
-// 	}
+	err := entity.UpdateImage(&imagemodel.ImageToUpdate{
+		Status:            mo.Some(imagemodel.ImageStatus(imagemodel.Succeeded)),
+		ConvertedImageURL: mo.Some("https://example.com/converted.jpg"),
+	})
+	if err != nil {
+		t.Fatal("failed to set test")
+	}
 
-// 	mock.ExpectBegin()
-// 	mock.ExpectExec(regexp.QuoteMeta("UPDATE `images` SET `converted_image_url` = ?, `status_id` = ? WHERE id = ?")).
-//     WithArgs(entity.Image().ConvertedImageURL, entity.Image().Status, entity.Image().ID).
-//     WillReturnResult(sqlmock.NewResult(1, 1))
-// 	mock.ExpectCommit()
+	mock.ExpectBegin()
+	mock.ExpectExec(regexp.QuoteMeta("UPDATE `images` SET `converted_image_url` = ?, `status_id` = ? WHERE id = ?")).
+		WithArgs(entity.Image().ConvertedImageURL, entity.Image().Status, entity.Image().ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
 
-// 	tx := db.Begin()
-// 	err = New().Update(context.Background(), tx, entity)
-// 	if err != nil {
-// 		t.Errorf(`Update(ctx, tx, image) = %+v; want %+v`, err, nil)
-// 	}
-// }
+	tx := db.Begin()
+	err = New().Update(context.Background(), tx, entity)
+	if err != nil {
+		t.Errorf(`Update(ctx, tx, image) = %+v; want %+v`, err, nil)
+	}
+}
 
 func TestCreate(t *testing.T) {
 	db, mock := database.NewDBMock()
