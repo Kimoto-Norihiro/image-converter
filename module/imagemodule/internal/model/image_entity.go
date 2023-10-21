@@ -27,7 +27,7 @@ func (ie *ImageEntity) SetStatus(status imagemodel.ImageStatus) {
 
 func NewImageEntityToCreate(
 	objectName string, resizeWidthPercent int, resizeHeightPercent int, encodeFormat imagemodel.EncodeFormat,
-) (*ImageEntity, error) {
+) *ImageEntity {
 	return &ImageEntity{
 		image: imagemodel.Image{
 			ObjectName:          objectName,
@@ -36,7 +36,7 @@ func NewImageEntityToCreate(
 			EncodeFormat:        encodeFormat,
 			Status:              imagemodel.Waiting,
 		},
-	}, nil
+	}
 }
 
 func NewAsyncJobEntityToUpdate(asyncJob *imagemodel.Image) *ImageEntity {

@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/internal/model"
+	imageentity "github.com/Kimoto-Norihiro/image-converter/module/imagemodule/internal/model"
 	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/model/imagemodel"
 	"gorm.io/gorm"
 )
 
 type ImageUsecase struct {
-	db *gorm.DB
+	db        *gorm.DB
 	imageRepo imageentity.ImageRepository
 }
 
@@ -32,20 +32,20 @@ func (u *ImageUsecase) ListImages(ctx context.Context) ([]imagemodel.Image, erro
 	return images, nil
 }
 
-func (u *ImageUsecase) CreateImage(ctx context.Context, objectName string, resizeWidthPercent int, resizeHeightPercent int, encodeFormat imagemodel.EncodeFormat) error {	
-	u.db.Transaction(func(tx *gorm.DB) error {
-		entity, err := imageentity.NewImageEntityToCreate(objectName, resizeWidthPercent, resizeHeightPercent, encodeFormat)
-		if err != nil {
-			return err
-		}
+func (u *ImageUsecase) CreateImage(ctx context.Context, objectName string, resizeWidthPercent int, resizeHeightPercent int, encodeFormat imagemodel.EncodeFormat) error {
+	err := u.db.Transaction(func(tx *gorm.DB) error {
+		entity := imageentity.NewImageEntityToCreate(objectName, resizeWidthPercent, resizeHeightPercent, encodeFormat)
 
-		err = u.imageRepo.Create(ctx, tx, entity)
+		err := u.imageRepo.Create(ctx, tx, entity)
 		if err != nil {
 			return err
 		}
 
 		return nil
 	})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -53,7 +53,7 @@ func (u *ImageUsecase) CreateImage(ctx context.Context, objectName string, resiz
 func (u *ImageUsecase) UpdateImage(ctx context.Context, id int64, statusID *imagemodel.ImageStatus, convertedImageURL *string) error {
 	var entity *imageentity.ImageEntity
 
-	u.db.Transaction(func(tx *gorm.DB) error {
+	err := u.db.Transaction(func(tx *gorm.DB) error {
 		var err error
 		entity, err = u.imageRepo.FindForUpdate(ctx, tx, id)
 		if err != nil {
@@ -74,6 +74,9 @@ func (u *ImageUsecase) UpdateImage(ctx context.Context, id int64, statusID *imag
 		}
 		return nil
 	})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
