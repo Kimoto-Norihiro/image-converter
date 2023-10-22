@@ -77,7 +77,7 @@ func TestUpdate(t *testing.T) {
 	}
 
 	mock.ExpectBegin()
-	mock.ExpectExec(regexp.QuoteMeta("UPDATE `images` SET `converted_image_url` = ?, `status_id` = ? WHERE id = ?")).
+	mock.ExpectExec(regexp.QuoteMeta("UPDATE `images` SET `converted_image_url`=?,`status_id`=? WHERE id = ?")).
 		WithArgs(entity.Image().ConvertedImageURL, entity.Image().Status, entity.Image().ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
@@ -146,3 +146,6 @@ func TestFindForUpdate(t *testing.T) {
 		t.Errorf(`FindForUpdate(ctx, tx, %+v) = %+v, %+v; want %+v, %+v`, image.ID, got, err, &image, nil)
 	}
 }
+
+// "UPDATE `images` SET `converted_image_url`=?,`status_id`=? WHERE id = ?" 
+// "UPDATE `images` SET `converted_image_url`=?,`status_id`=? WHERE id = ?"
