@@ -9,6 +9,7 @@ import (
 
 	"github.com/samber/mo"
 	"golang.org/x/image/draw"
+	imageservicepb "github.com/Kimoto-Norihiro/image-converter/pkg/grpc"
 )
 
 type ImageStatus int
@@ -97,4 +98,20 @@ func (i *Image) Convert() error {
 type ImageToUpdate struct {
 	Status            mo.Option[ImageStatus]
 	ConvertedImageURL mo.Option[string]
+}
+
+func ImageModelsToImageServicePbs(images []Image) []*imageservicepb.Image {
+	imagepbs := []*imageservicepb.Image{}
+	for _, image := range images {
+		imagepbs = append(imagepbs, &imageservicepb.Image{
+			Id:                  image.ID,
+			ObjectName:          image.ObjectName,
+			ResizeWidthPercent:  int32(image.ResizeWidthPercent),
+			ResizeHeightPercent: int32(image.ResizeHeightPercent),
+			EncodeFormat:        imageservicepb.EncodeFormat(image.EncodeFormat),
+			Status:              imageservicepb.ImageStatus(image.Status),
+			ConvertedImageUrl:   image.ConvertedImageURL,
+		})
+	}
+	return imagepbs
 }
