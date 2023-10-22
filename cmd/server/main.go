@@ -24,7 +24,7 @@ func main() {
 	}
 
 	port := os.Getenv("SERVER_PORT")
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%v", 8080))
 	if err != nil {
 		panic(err)
 	}

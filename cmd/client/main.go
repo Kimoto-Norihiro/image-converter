@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	imageservicepb "github.com/Kimoto-Norihiro/image-converter/pkg/grpc"
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -20,6 +21,11 @@ var (
 )
 
 func main() {
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		panic(err)
+	}
+
 	fmt.Println("start gRPC Client.")
 	scanner = bufio.NewScanner(os.Stdin)
 
@@ -117,7 +123,7 @@ func CreateImage() {
 		fmt.Print("resize width percent: ")
 		scanner.Scan()
 		input := scanner.Text()
-		i, err := strconv.Atoi(input);
+		i, err := strconv.Atoi(input)
 		if err != nil {
 			fmt.Println("please enter number")
 			continue
@@ -136,7 +142,7 @@ func CreateImage() {
 		fmt.Print("resize height percent: ")
 		scanner.Scan()
 		input := scanner.Text()
-		i, err := strconv.Atoi(input);
+		i, err := strconv.Atoi(input)
 		if err != nil {
 			fmt.Println("please enter number")
 			continue
