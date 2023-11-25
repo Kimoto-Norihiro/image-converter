@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/Kimoto-Norihiro/image-converter/gcs"
-	gcsclient "github.com/Kimoto-Norihiro/image-converter/gcs/gcs_client"
+	gcsclient "github.com/Kimoto-Norihiro/image-converter/gcs/gcsclient"
 	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule"
 	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/imagemoduleclient"
 	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/model/imagemodel"

@@ -6,6 +6,7 @@ import (
 
 	imageentity "github.com/Kimoto-Norihiro/image-converter/module/imagemodule/internal/model"
 	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/model/imagemodel"
+	"github.com/Kimoto-Norihiro/image-converter/utils/myerror"
 	"gorm.io/gorm"
 )
 
@@ -24,7 +25,9 @@ func NewImageUsecase(
 	}
 }
 
-func (u *ImageUsecase) ListImages(ctx context.Context) ([]imagemodel.Image, error) {
+func (u *ImageUsecase) ListImages(ctx context.Context) (_ []imagemodel.Image, reterr error) {
+	defer myerror.Wrap(&reterr, "ListImages in ImageUsecase")
+
 	images, err := u.imageRepo.ListImages(ctx, u.db)
 	if err != nil {
 		return nil, err
@@ -32,7 +35,9 @@ func (u *ImageUsecase) ListImages(ctx context.Context) ([]imagemodel.Image, erro
 	return images, nil
 }
 
-func (u *ImageUsecase) CreateImage(ctx context.Context, objectName string, resizeWidthPercent int, resizeHeightPercent int, encodeFormat imagemodel.EncodeFormat) error {
+func (u *ImageUsecase) CreateImage(ctx context.Context, objectName string, resizeWidthPercent int, resizeHeightPercent int, encodeFormat imagemodel.EncodeFormat) (reterr error) {
+	defer myerror.Wrap(&reterr, "CreateImage in ImageUsecase")
+
 	err := u.db.Transaction(func(tx *gorm.DB) error {
 		entity := imageentity.NewImageEntityToCreate(objectName, resizeWidthPercent, resizeHeightPercent, encodeFormat)
 
@@ -50,9 +55,10 @@ func (u *ImageUsecase) CreateImage(ctx context.Context, objectName string, resiz
 	return nil
 }
 
-func (u *ImageUsecase) UpdateImage(ctx context.Context, id int64, statusID *imagemodel.ImageStatus, convertedImageURL *string) error {
-	var entity *imageentity.ImageEntity
+func (u *ImageUsecase) UpdateImage(ctx context.Context, id int64, statusID *imagemodel.ImageStatus, convertedImageURL *string) (reterr error) {
+	defer myerror.Wrap(&reterr, "UpdateImage in ImageUsecase")
 
+	var entity *imageentity.ImageEntity
 	err := u.db.Transaction(func(tx *gorm.DB) error {
 		var err error
 		entity, err = u.imageRepo.FindForUpdate(ctx, tx, id)

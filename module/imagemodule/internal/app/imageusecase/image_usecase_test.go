@@ -65,10 +65,9 @@ func TestListImages_errors(t *testing.T) {
 	m.imageRepo.EXPECT().ListImages(gomock.Any(), gomock.Any()).Return(nil, wantErr)
 
 	ctx := context.Background()
-
 	got, err := mustImageUsecase(m).ListImages(ctx)
 
-	if !errors.Is(wantErr, err) {
+	if !errors.Is(err, wantErr) {
 		t.Errorf(`ListImage(ctx) = %+v, %+v; want %+v, %+v`, got, err, nil, wantErr)
 	}
 }
@@ -114,7 +113,7 @@ func TestCreateImage_error(t *testing.T) {
 
 	err := mustImageUsecase(m).CreateImage(ctx, ObjectName, ResizeWidthPercent, ResizeHeightPercent, EncodeFormat)
 
-	if !errors.Is(wantErr, err) {
+	if !errors.Is(err, wantErr) {
 		t.Errorf(`CreateImage(ctx, %+v, %+v, %+v, %+v) = %+v; want %+v`, ObjectName, ResizeWidthPercent, ResizeHeightPercent, EncodeFormat, err, wantErr)
 	}
 }
@@ -200,7 +199,7 @@ func TestUpdateImage_error(t *testing.T) {
 			m := makeImageUsecaseMockSet(ctrl)
 			tc.setup(&m)
 			err := mustImageUsecase(m).UpdateImage(ctx, ID, &StatusID, &ConvertedImageURL)
-			if !errors.Is(tc.wantErr, err) {
+			if !errors.Is(err, tc.wantErr) {
 				t.Errorf(`UpdateImage(ctx, %+v, %+v, %+v) = %+v; want %+v`, ID, StatusID, ConvertedImageURL, err, tc.wantErr)
 			}
 		})

@@ -3,12 +3,15 @@ package imagerepository
 import (
 	"context"
 
-	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/internal/model"
+	imageentity "github.com/Kimoto-Norihiro/image-converter/module/imagemodule/internal/model"
 	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/model/imagemodel"
+	"github.com/Kimoto-Norihiro/image-converter/utils/myerror"
 	"gorm.io/gorm"
 )
 
-func (r *repo) ListImages(ctx context.Context, db *gorm.DB) ([]imagemodel.Image, error) {
+func (r *repo) ListImages(ctx context.Context, db *gorm.DB) (_ []imagemodel.Image, reterr error) {
+	defer myerror.Wrap(&reterr, "ListImages in ImageRepository")
+
 	var images []ImageDTO
 	err := db.Find(&images).Error
 	if err != nil {
@@ -18,7 +21,9 @@ func (r *repo) ListImages(ctx context.Context, db *gorm.DB) ([]imagemodel.Image,
 	return ImagesFromDTO(images)
 }
 
-func (r *repo) Update(ctx context.Context, tx *gorm.DB, entity *imageentity.ImageEntity) error {
+func (r *repo) Update(ctx context.Context, tx *gorm.DB, entity *imageentity.ImageEntity) (reterr error) {
+	defer myerror.Wrap(&reterr, "Update in ImageRepository")
+	
 	upValues, err := entity.UpdateValues()
 	if err != nil {
 		return err
@@ -35,7 +40,9 @@ func (r *repo) Update(ctx context.Context, tx *gorm.DB, entity *imageentity.Imag
 		Error
 }
 
-func (r *repo) Create(ctx context.Context, tx *gorm.DB, entity *imageentity.ImageEntity) error {
+func (r *repo) Create(ctx context.Context, tx *gorm.DB, entity *imageentity.ImageEntity) (reterr error) {
+	defer myerror.Wrap(&reterr, "Create in ImageRepository")
+	
 	ImageDTO, err := DTOFromImage(entity.Image())
 	if err != nil {
 		return err
@@ -43,7 +50,9 @@ func (r *repo) Create(ctx context.Context, tx *gorm.DB, entity *imageentity.Imag
 	return tx.Create(ImageDTO).Error
 }
 
-func (r *repo) FindForUpdate(ctx context.Context, tx *gorm.DB, id int64) (*imageentity.ImageEntity, error) {
+func (r *repo) FindForUpdate(ctx context.Context, tx *gorm.DB, id int64) (_ *imageentity.ImageEntity, reterr error) {
+	defer myerror.Wrap(&reterr, "FindForUpdate in ImageRepository")
+	
 	var image ImageDTO
 	err := tx.Where("id = ?", id).First(&image).Error
 	if err != nil {

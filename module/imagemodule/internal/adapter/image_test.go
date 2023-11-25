@@ -146,6 +146,3 @@ func TestFindForUpdate(t *testing.T) {
 		t.Errorf(`FindForUpdate(ctx, tx, %+v) = %+v, %+v; want %+v, %+v`, image.ID, got, err, &image, nil)
 	}
 }
-
-// "UPDATE `images` SET `converted_image_url`=?,`status_id`=? WHERE id = ?" 
-// "UPDATE `images` SET `converted_image_url`=?,`status_id`=? WHERE id = ?"

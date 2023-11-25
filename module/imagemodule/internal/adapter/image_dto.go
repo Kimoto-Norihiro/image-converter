@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Kimoto-Norihiro/image-converter/module/imagemodule/model/imagemodel"
+	"github.com/Kimoto-Norihiro/image-converter/utils/myerror"
 )
 
 type ImageDTO struct {
@@ -20,7 +21,9 @@ func (ImageDTO) TableName() string {
 	return "images"
 }
 
-func ImageFromDTO(dto *ImageDTO) (*imagemodel.Image, error) {
+func ImageFromDTO(dto *ImageDTO) (_ *imagemodel.Image, reterr error) {
+	defer myerror.Wrap(&reterr, "ImageFromDTO in ImageRepository")
+
 	encodeFormat, err := ImageEncodingFormatFromID(dto.EncodeFormatID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid encode format id %v", dto)
@@ -43,7 +46,9 @@ func ImageFromDTO(dto *ImageDTO) (*imagemodel.Image, error) {
 	return model, nil
 }
 
-func ImagesFromDTO(dtos []ImageDTO) ([]imagemodel.Image, error) {
+func ImagesFromDTO(dtos []ImageDTO) (_ []imagemodel.Image, reterr error) {
+	defer myerror.Wrap(&reterr, "ImagesFromDTO in ImageRepository")
+
 	if dtos == nil {
 		return nil, nil
 	}
@@ -60,6 +65,8 @@ func ImagesFromDTO(dtos []ImageDTO) ([]imagemodel.Image, error) {
 }
 
 func DTOFromImage(model *imagemodel.Image) (*ImageDTO, error) {
+	defer myerror.Wrap(nil, "DTOFromImage in ImageRepository")
+
 	encodeFormatID, err := ImageEncodingFormatToID(model.EncodeFormat)
 	if err != nil {
 		return nil, err
@@ -82,7 +89,9 @@ func DTOFromImage(model *imagemodel.Image) (*ImageDTO, error) {
 	return dto, nil
 }
 
-func DTOFromImages(models []imagemodel.Image) ([]ImageDTO, error) {
+func DTOFromImages(models []imagemodel.Image) (_ []ImageDTO, reterr error) {
+	defer myerror.Wrap(&reterr, "DTOFromImages in ImageRepository")
+
 	if models == nil {
 		return nil, nil
 	}
